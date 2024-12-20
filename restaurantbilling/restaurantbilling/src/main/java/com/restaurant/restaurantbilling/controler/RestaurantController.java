@@ -1,15 +1,18 @@
 package com.restaurant.restaurantbilling.controler;
 
-import com.restaurant.restaurantbilling.dao.RestaurantRequest;
+import com.restaurant.restaurantbilling.dto.RestaurantRequestDTO;
+import com.restaurant.restaurantbilling.dto.RestaurantResponseDTO;
 import com.restaurant.restaurantbilling.entity.Restaurant;
 import com.restaurant.restaurantbilling.service.RestaurantService;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
 @RestController
-@RequestMapping("/restaurants")
+@RequestMapping("/api")
 public class RestaurantController {
 
     @Autowired
@@ -20,22 +23,23 @@ public class RestaurantController {
         return restaurantService.getRestaurants();
     }
 
-    @PostMapping
-    public Restaurant addRestaurant(@RequestBody Restaurant restaurant) {
-        return restaurantService.addRestaurant(restaurant);
+
+
+
+    @PostMapping("/restaurants/add")
+    public ResponseEntity<RestaurantResponseDTO> addRestaurant(@RequestBody RestaurantRequestDTO requestDTO) {
+        RestaurantResponseDTO responseDTO = restaurantService.addRestaurant(requestDTO);
+        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
- /*   @PostMapping
-    public Restaurant addRestaurant(@RequestBody RestaurantRequest restaurantRequest) {
-        if (restaurantRequest.getName() == null || restaurantRequest.getName().isEmpty()) {
-            throw new IllegalArgumentException("Restaurant name is mandatory.");
-        }
-        if (restaurantRequest.getAddress() == null || restaurantRequest.getAddress().isEmpty()) {
-            throw new IllegalArgumentException("Restaurant address is mandatory.");
-        }
-        if (restaurantRequest.getMenuItems() == null || restaurantRequest.getMenuItems().isEmpty()) {
-            throw new IllegalArgumentException("At least one menu item is required.");
-        }
-        return restaurantService.addRestaurantWithMenu(restaurantRequest);
-    }*/
+
+
+
+    @PutMapping("/restaurants/update/{id}")
+    public ResponseEntity<RestaurantResponseDTO> updateRestaurant(
+            @PathVariable Long id, @RequestBody RestaurantRequestDTO requestDTO) {
+        RestaurantResponseDTO responseDTO = restaurantService.updateRestaurantWithoutDuplicateItems(id, requestDTO);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
 }
